@@ -21,7 +21,6 @@ __Asumiendo que ya se haya cargado correctamente el medio de instalación, se pr
 	* [Paquetes AUR](#arch-user-repository)
 	* [Entorno de Escritorio](#entorno-de-escritorio)
 
-3. Archivos
 
 # Preparación Inicial
 ### Disposición del Teclado
@@ -59,7 +58,7 @@ cfdisk /dev/nvme0n1
 			Disk: /dev/nvme0n1
 
     Device               Size Type
-    /dev/nvme0n1p1       100M EFI System
+    /dev/nvme0n1p1       100M EFI Systemb
     /dev/nvme0n1p2       16M Microsoft reserved
     /dev/nvme0n1p3       140.1G Microsoft basic data
     /dev/nvme0n1p4       638M Windows recovery environment
@@ -155,7 +154,7 @@ device list
 device wlan0 set-property Powered on
 ```
 ```bash
-adapter adapter set-property Powered on
+adapter phy0 set-property Powered on
 ```
 ##### Escaneamos redes Wifi
 ```bash
@@ -246,20 +245,43 @@ usermod -aG wheel usuario
 ```
 groups usuario
 ```
-##### Iniciamos servicios de Wifi
+##### Activamos servicios de Wifi
 
 ```
 systemctl enable NetworkManager
 ```
 ```
-systemctl start NetworkManager
-```
-```
 systemctl enable wpa_supplicant
 ```
+
+
+#### Configuramos el bootloader
+
+##### Instalamos grub
+
 ```
-systemctl start wpa_supplicant
+grub-install --efi-directory=/boot/efi --bootloader-id='Arch Linux' --target=x86_64-efi
 ```
+
+##### Actualizar la configuración de grub
+
+```
+grub-mkconfig -o /boot/grub/grub.cfg
+```
+
+##### Salimos y Reiniciamos
+
+```
+exit
+```
+```
+reboot now
+```
+Luego se debe de ingresar a la sesión con el usuario root
+
+### Más Configuraciones
+
+### Nos conectamos a internet
 ##### Listamos las red Wifi
 ```
 nmcli device wifi list
@@ -273,6 +295,28 @@ nmcli device wifi connect "SSID" password "PASS"
 ```
 pacman -S nano
 ```
+##### Para dualboot se debe de instalar `os-prober`
+```
+pacman -S os-prober
+``` 
+
+##### Acceder al archivo, descomentar la linea y salir 
+`/etc/default/grub`
+```
+GRUB_DISABLE_OS_PROBER=false
+```
+##### Luego ejecutamos os-prober
+```
+os-prober
+```
+
+##### Actualizar la configuración de grub
+
+```
+grub-mkconfig -o /boot/grub/grub.cfg
+```
+
+
 
 ## Configuración de Permisos
 
@@ -302,48 +346,6 @@ locale-gen
 ```
 KEYMAP=la-latin1
 ```
-#### Configuramos el bootloader
-
-##### Instalamos grub
-
-```
-grub-install --efi-directory=/boot/efi --bootloader-id='Arch Linux' --target=x86_64-efi
-```
-
-##### Para dualboot se debe de instalar `os-prober`
-```
-pacman -S os-prober
-``` 
-
-##### Acceder al archivo, descomentar la linea y salir 
-`/etc/default/grub`
-```
-GRUB_DISABLE_OS_PROBER=false
-```
-##### Luego ejecutamos os-prober
-```
-os-prober
-```
-
-##### Actualizar la configuración de grub
-
-```
-grub-mkconfig -o /boot/grub/grub.cfg
-```
-
-##### Salimos y Reiniciamos
-
-```
-exit
-```
-```
-reboot now
-```
-Luego se debe de ingresar a la sesión con el usuario creado
-
-### Más Configuraciones
-
-### Nos conectamos a internet
 
 #### Descargar drivers de video
 ###### Intel
